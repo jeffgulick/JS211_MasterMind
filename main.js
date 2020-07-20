@@ -9,12 +9,13 @@ const rl = readline.createInterface({
 
 var colors = require('colors');
 let board = [];
+let currentGuess = [];
 let solution = '';
 let letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
-const printBoard = () =>  {
+const printBoard = (guess) =>  {
   for (let i = 0; i < board.length; i++) {
-    console.log(board[i]);
+    console.log(currentGuess[i] + ' ' + board[i]);
   }
 }
 
@@ -24,14 +25,13 @@ const generateSolution = () =>  {
     const randomIndex = getRandomInt(0, letters.length);
     solution += letters[randomIndex];
   }
-
-  console.log(solution)
 }
 //random numbers hhb
 const getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+//func generates hints. finds letter loc and correct letters in guess
 const generateHint = (guess) =>  {
   let solutionArray = [];
   let guessArray = [];
@@ -58,37 +58,56 @@ for(let i = 0; i<solutionArray.length; i++){
     solutionArray[i] = null;
   }
 }
-let hint = colors.red(correctLetters) + ' - ' + correctLetterLocations;
-
+let hint = colors.red(correctLetterLocations) + ' - ' + correctLetters;
 return hint;
 }
-
+//checks for win and keeps game going
 const mastermind = (guess) => {
-  if (guess != solution){
-   let hint = generateHint(guess);
-    console.log("Current Hint: " + hint)
-    board.push(hint)
+  if(legal(guess) == true){
+    if (guess != solution){
+    let hint = generateHint(guess);
+      console.log("Current Hint: " + hint);
+      board.push(hint);
+      currentGuess.push(guess);
+    }
+
+    else if (guess == solution){
+      console.log(' ')
+      console.log(colors.blue('You guessed it!!!!'));
+      console.log('')
+      console.log('Time for a new game.')
+      console.log('Start Guessing')
+      console.log(' ')
+      resetGame();
+      return "You guessed it!";
   }
-
-  else if (guess == solution){
-    console.log('You guessed it!!!!');
-    console.log('Time for a new game.')
-    console.log('START GUESSING')
-    resetGame();
-    return "You guessed it!";
+} else {
+  console.log('Invalid Input. Try again.')
 }
 }
-
+//resets game/variables
 const resetGame = () => {
   board = [];
   solution = '';
   generateSolution();
 }
-
+//makes sure there are only ten turns
 const checkTurn = () => {
   if(board.length == 10){
     console.log('Sorry you are out of turns. Time for a new game.');
     resetGame();
+  }
+}
+//checks for valid input
+const legal = (guess) => {
+  if(guess.length === 4){
+    if(!isNaN(guess)){
+      return false;
+    } else {
+      return true
+    }
+  } else {
+    return false;
   }
 }
 
